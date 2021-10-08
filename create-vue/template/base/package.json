@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preserve": "vite build",
+    "serve": "vite preview --port 5050"
+  },
+  "dependencies": {
+    "vue": "^3.2.14"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^1.9.3",
+    "vite": "^2.6.3"
+  }
+}

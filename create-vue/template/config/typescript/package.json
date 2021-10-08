@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "build": "vue-tsc --noEmit && vite build",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "~4.3.5",
+    "vue-tsc": "^0.3.0"
+  }
+}

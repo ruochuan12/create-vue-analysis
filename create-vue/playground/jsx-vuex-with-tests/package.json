@@ -1,0 +1,27 @@
+{
+  "name": "jsx-vuex-with-tests",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preserve": "vite build",
+    "serve": "vite preview --port 5050",
+    "test:unit": "cypress open-ct",
+    "test:unit:ci": "cypress run-ct --quiet --reporter spec",
+    "test:e2e": "start-server-and-test serve 5050 'cypress open'",
+    "test:e2e:ci": "start-server-and-test serve 5050 'cypress run'"
+  },
+  "dependencies": {
+    "vue": "^3.2.14",
+    "vuex": "^4.0.2"
+  },
+  "devDependencies": {
+    "@cypress/vite-dev-server": "^2.1.1",
+    "@cypress/vue": "^3.0.3",
+    "@vitejs/plugin-vue": "^1.9.3",
+    "@vitejs/plugin-vue-jsx": "^1.2.0",
+    "cypress": "^8.5.0",
+    "start-server-and-test": "^1.14.0",
+    "vite": "^2.6.3"
+  }
+}
