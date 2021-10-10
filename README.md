@@ -4,12 +4,12 @@
 
 阅读本文，你将学到：
 
-```bash
+```sh
 1. 学会全新的官方脚手架工具 create-vue 的使用和原理
 2. 学会使用 VSCode 直接打开github 项目
 3. 学会使用测试用例调试源码
-4. 学以致用，落实到公司项目中。
-4. 等等
+4. 学以致用，为公司项目初始化中写脚手架工具。
+5. 等等
 ```
 
 ## 使用
@@ -72,16 +72,24 @@ npm dist-tag ls create-vue
 
 发布时 `npm publish --tag next` 这种写法指定 `tag`。默认标签是`latest`。
 
-但是我们可能对 `npx`不熟悉，这时找到[阮一峰老师博客 npx 介绍](http://www.ruanyifeng.com/blog/2019/02/npx.html)、[nodejs.cn npx](http://nodejs.cn/learn/the-npx-nodejs-package-runner)
+可能有读者对 `npx` 不熟悉，这时找到[阮一峰老师博客 npx 介绍](http://www.ruanyifeng.com/blog/2019/02/npx.html)、[nodejs.cn npx](http://nodejs.cn/learn/the-npx-nodejs-package-runner)
+
+`npx 是一个非常强大的命令，从 npm 的 5.2 版本（发布于 2017 年 7 月）开始可用。`
 
 简单说下容易忽略且常用的场景，`npx`有点类似小程序提出的随用随走。
 
 **轻松地运行本地命令**
 
 ```sh
-node_modules/.bin/jest
+node_modules/.bin/vite -v
+# vite/2.6.5 linux-x64 node-v14.16.0
 
-npx jest
+# 等同于
+# package.json script: "vite -v"
+# npm run vite
+
+npx vite -v
+# vite/2.6.5 linux-x64 node-v14.16.0
 ```
 
 **使用不同的 Node.js 版本运行代码**
@@ -122,7 +130,7 @@ vue create vue-project
 
 [本文仓库地址 create-vue-analysis](https://github.com/lxchuan12/create-vue-analysis.git)，求个`star`~
 
-```bash
+```sh
 # 可以直接克隆我的仓库，我的仓库保留的 create-vue 仓库的 git 记录
 git clone https://github.com/lxchuan12/create-vue-analysis.git
 cd create-vue/compose
@@ -134,7 +142,7 @@ npm i
 
 顺带说下：我是怎么保留 `create-vue` 仓库的 `git` 记录的。
 
-```bash
+```sh
 # 在 github 上新建一个仓库 `create-vue-analysis` 克隆下来
 git clone https://github.com/lxchuan12/create-vue-analysis.git
 cd create-vue-analysis
@@ -146,17 +154,16 @@ git subtree add --prefix=create-vue https://github.com/vuejs/create-vue.git main
 
 ## 源码主流程
 
-
 回顾下上文 `npm init vue@next` 初始化项目的。
 
 ![npm init vue@next](./images/npm-init-vue@next.png)
 
-我们接着准备环境，看源码仓库。
+单从初始化项目输出图来看。主要是三个步骤。
 
 ```sh
 1. 输入项目名称，默认值是 vue-project
-2. 
-3. 生成 README
-. 输出提示
-. 
+2. 询问 一些配置 渲染模板等
+3. 完成创建项目，输出运行提示
 ```
+
+### 
