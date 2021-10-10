@@ -12,7 +12,7 @@
 5. 等等
 ```
 
-## 使用
+## 2. 使用 npm init vue@next 初始化 vue3 项目
 
 [create-vue github README](https://github.com/vuejs/create-vue)上写着，`An easy way to start a Vue project`。一种简单的初始化vue项目的方式。
 
@@ -133,11 +133,11 @@ vue create vue-project
 ```sh
 # 可以直接克隆我的仓库，我的仓库保留的 create-vue 仓库的 git 记录
 git clone https://github.com/lxchuan12/create-vue-analysis.git
-cd create-vue/compose
+cd create-vue-analysis/create-vue
 npm i
 ```
 
-可以直接用 `VSCode` 打开我的仓库
+当然不克隆也可以直接用 `VSCode` 打开我的仓库
 [![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/lxchuan12/create-vue-analysis)
 
 顺带说下：我是怎么保留 `create-vue` 仓库的 `git` 记录的。
@@ -162,8 +162,134 @@ git subtree add --prefix=create-vue https://github.com/vuejs/create-vue.git main
 
 ```sh
 1. 输入项目名称，默认值是 vue-project
-2. 询问 一些配置 渲染模板等
+2. 询问一些配置 渲染模板等
 3. 完成创建项目，输出运行提示
 ```
 
+```js
+async function init() {
+}
+init().catch((e) => {
+  console.error(e)
+})
+```
+
 ### 
+
+```js
+const cwd = process.cwd()
+// possible options:
+// --default
+// --typescript / --ts
+// --jsx
+// --router / --vue-router
+// --vuex
+// --with-tests / --tests / --cypress
+// --force (for force overwriting)
+const argv = minimist(process.argv.slice(2), {
+    alias: {
+        typescript: ['ts'],
+        'with-tests': ['tests', 'cypress'],
+        router: ['vue-router']
+    },
+    // all arguments are treated as booleans
+    boolean: true
+})
+```
+
+```js
+// if any of the feature flags is set, we would skip the feature prompts
+  // use `??` instead of `||` once we drop Node.js 12 support
+  const isFeatureFlagsUsed =
+    typeof (argv.default || argv.ts || argv.jsx || argv.router || argv.vuex || argv.tests) ===
+    'boolean'
+
+  let targetDir = argv._[0]
+  const defaultProjectName = !targetDir ? 'vue-project' : targetDir
+
+  const forceOverwrite = argv.force
+```
+
+### 需要 ts
+// rename all `.js` files to `.ts`
+// rename jsconfig.json to tsconfig.json
+
+```js
+// Cleanup.
+
+if (needsTypeScript) {
+    // rename all `.js` files to `.ts`
+    // rename jsconfig.json to tsconfig.json
+    preOrderDirectoryTraverse(
+      root,
+      () => {},
+      (filepath) => {
+        if (filepath.endsWith('.js')) {
+          fs.renameSync(filepath, filepath.replace(/\.js$/, '.ts'))
+        } else if (path.basename(filepath) === 'jsconfig.json') {
+          fs.renameSync(filepath, filepath.replace(/jsconfig\.json$/, 'tsconfig.json'))
+        }
+      }
+    )
+
+    // Rename entry in `index.html`
+    const indexHtmlPath = path.resolve(root, 'index.html')
+    const indexHtmlContent = fs.readFileSync(indexHtmlPath, 'utf8')
+    fs.writeFileSync(indexHtmlPath, indexHtmlContent.replace('src/main.js', 'src/main.ts'))
+  }
+```
+
+### 
+
+```js
+  if (!needsTests) {
+    // All templates assumes the need of tests.
+    // If the user doesn't need it:
+    // rm -rf cypress **/__tests__/
+    preOrderDirectoryTraverse(
+      root,
+      (dirpath) => {
+        const dirname = path.basename(dirpath)
+
+        if (dirname === 'cypress' || dirname === '__tests__') {
+          emptyDir(dirpath)
+          fs.rmdirSync(dirpath)
+        }
+      },
+      () => {}
+    )
+  }
+```
+
+### 
+
+```js
+// Instructions:
+  // Supported package managers: pnpm > yarn > npm
+  // Note: until <https://github.com/pnpm/pnpm/issues/3505> is resolved,
+  // it is not possible to tell if the command is called by `pnpm init`.
+  const packageManager = /pnpm/.test(process.env.npm_execpath)
+    ? 'pnpm'
+    : /yarn/.test(process.env.npm_execpath)
+    ? 'yarn'
+    : 'npm'
+
+  // README generation
+  fs.writeFileSync(
+    path.resolve(root, 'README.md'),
+    generateReadme({
+      projectName: result.projectName || defaultProjectName,
+      packageManager,
+      needsTypeScript,
+      needsTests
+    })
+  )
+
+  console.log(`\nDone. Now run:\n`)
+  if (root !== cwd) {
+    console.log(`  ${bold(green(`cd ${path.relative(cwd, root)}`))}`)
+  }
+  console.log(`  ${bold(green(getCommand(packageManager, 'install')))}`)
+  console.log(`  ${bold(green(getCommand(packageManager, 'dev')))}`)
+  console.log()
+```
