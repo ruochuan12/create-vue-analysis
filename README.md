@@ -2,6 +2,10 @@
 
 ## 前言
 
+Vue
+
+[蒋豪群](https://github.com/sodatea)，[知乎胖茶](https://www.zhihu.com/people/sodatea) Vue.js 官方团队成员。
+
 阅读本文，你将学到：
 
 ```sh
@@ -29,7 +33,6 @@ npm init vue@next
 最终`cd vue3-project`、`npm install` 、`npm run dev`打开页面[http://localhost:3000](http://localhost:3000)。
 
 ![初始化页面](./images/init-page.png)
-
 
 ### npm init && npx
 
@@ -168,6 +171,7 @@ git subtree add --prefix=create-vue https://github.com/vuejs/create-vue.git main
 
 ```js
 async function init() {
+  // 省略放在后文详细讲述
 }
 init().catch((e) => {
   console.error(e)
@@ -177,6 +181,7 @@ init().catch((e) => {
 ### 
 
 ```js
+// 返回运行当前脚本的工作目录的路径。
 const cwd = process.cwd()
 // possible options:
 // --default
@@ -210,9 +215,140 @@ const argv = minimist(process.argv.slice(2), {
   const forceOverwrite = argv.force
 ```
 
+```js
+let result = {}
+
+  try {
+    // Prompts:
+    // - Project name:
+    //   - whether to overwrite the existing directory or not?
+    //   - enter a valid package name for package.json
+    // - Project language: JavaScript / TypeScript
+    // - Add JSX Support?
+    // - Install Vue Router for SPA development?
+    // - Install Vuex for state management? (TODO)
+    // - Add Cypress for testing?
+    result = await prompts(
+      [
+        {
+          name: 'projectName',
+          type: targetDir ? null : 'text',
+          message: 'Project name:',
+          initial: defaultProjectName,
+          onState: (state) => (targetDir = String(state.value).trim() || defaultProjectName)
+        },
+        // 省略若干配置
+        {
+          name: 'needsTests',
+          type: () => (isFeatureFlagsUsed ? null : 'toggle'),
+          message: 'Add Cypress for testing?',
+          initial: false,
+          active: 'Yes',
+          inactive: 'No'
+        }
+      ],
+      {
+        onCancel: () => {
+          throw new Error(red('✖') + ' Operation cancelled')
+        }
+      }
+    ]
+    )
+  } catch (cancelled) {
+    console.log(cancelled.message)
+    // 退出当前进程。
+    process.exit(1)
+  }
+```
+
+### 初始化询问用户给到的参数，同时也会给到默认值
+
+```js
+// `initial` won't take effect if the prompt type is null
+  // so we still have to assign the default values here
+  const {
+    packageName = toValidPackageName(defaultProjectName),
+    shouldOverwrite,
+    needsJsx = argv.jsx,
+    needsTypeScript = argv.typescript,
+    needsRouter = argv.router,
+    needsVuex = argv.vuex,
+    needsTests = argv.tests
+  } = result
+  const root = path.join(cwd, targetDir)
+
+  if (shouldOverwrite) {
+    emptyDir(root)
+  } else if (!fs.existsSync(root)) {
+    fs.mkdirSync(root)
+  }
+
+  console.log(`\nScaffolding project in ${root}...`)
+
+  const pkg = { name: packageName, version: '0.0.0' }
+  fs.writeFileSync(path.resolve(root, 'package.json'), JSON.stringify(pkg, null, 2))
+```
+
+```js
+  // todo:
+  // work around the esbuild issue that `import.meta.url` cannot be correctly transpiled
+  // when bundling for node and the format is cjs
+  // const templateRoot = new URL('./template', import.meta.url).pathname
+  const templateRoot = path.resolve(__dirname, 'template')
+  const render = function render(templateName) {
+    const templateDir = path.resolve(templateRoot, templateName)
+    renderTemplate(templateDir, root)
+  }
+
+  // Render base template
+  render('base')
+
+   // 添加配置
+  // Add configs.
+  if (needsJsx) {
+    render('config/jsx')
+  }
+  if (needsRouter) {
+    render('config/router')
+  }
+  if (needsVuex) {
+    render('config/vuex')
+  }
+  if (needsTests) {
+    render('config/cypress')
+  }
+  if (needsTypeScript) {
+    render('config/typescript')
+  }
+```
+
+### 渲染生成代码模板
+
+```js
+// Render code template.
+  // prettier-ignore
+  const codeTemplate =
+    (needsTypeScript ? 'typescript-' : '') +
+    (needsRouter ? 'router' : 'default')
+  render(`code/${codeTemplate}`)
+
+  // Render entry file (main.js/ts).
+  if (needsVuex && needsRouter) {
+    render('entry/vuex-and-router')
+  } else if (needsVuex) {
+    render('entry/vuex')
+  } else if (needsRouter) {
+    render('entry/router')
+  } else {
+    render('entry/default')
+  }
+```
+
 ### 需要 ts
-// rename all `.js` files to `.ts`
-// rename jsconfig.json to tsconfig.json
+
+重命名所有的 `.js` 文件改成 `.ts`。
+重命名 `jsconfig.json` 文件为 `tsconfig.json` 文件。
+[jsconfig.json](https://code.visualstudio.com/docs/languages/jsconfig) 是VSCode的配置文件，可用于配置跳转等。
 
 ```js
 // Cleanup.
@@ -239,7 +375,9 @@ if (needsTypeScript) {
   }
 ```
 
-### 
+### 不需要测试
+
+因为所有的模板都有测试文件，所以不需要测试时，执行删除 `cypress`、`/__tests__/` 文件夹
 
 ```js
   if (!needsTests) {
