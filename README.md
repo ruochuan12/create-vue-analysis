@@ -3,7 +3,7 @@ highlight: darcula
 theme: smartblue
 ---
 
-# Vue 团队公开快如闪电的脚手架工具 create-vue，未来将替代 Vue-CLI，才300余行代码，学它！
+# Vue 团队公开快如闪电的全新脚手架工具 create-vue，未来将替代 Vue-CLI，才300余行代码，学它！
 
 ## 1. 前言
 
@@ -23,7 +23,7 @@ theme: smartblue
 1. 学会全新的官方脚手架工具 create-vue 的使用和原理
 2. 学会使用 VSCode 直接打开 github 项目
 3. 学会使用测试用例调试源码
-4. 学以致用，为公司项目初始化中写脚手架工具。
+4. 学以致用，为公司初始化项目写脚手架工具。
 5. 等等
 ```
 
