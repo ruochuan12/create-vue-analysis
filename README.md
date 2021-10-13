@@ -652,7 +652,7 @@ npm init vue@next => npx create-vue@next
 
 学完本文，可以为自己或者公司创建类似初始化脚手架。
 
-目前版本是`3.0.0-beta.6`。我们持续关注学习它。
+目前版本是`3.0.0-beta.6`。我们持续关注学习它。除了create-vue 之外，我们还可以看看[create-vite](https://github.com/vitejs/vite/tree/main/packages/create-vite)、[create-umi](https://github.com/umijs/create-umi) 的源码实现。
 
 最后欢迎加我微信 [ruochuan12](https://juejin.cn/pin/7005372623400435725) 交流，参与 [源码共读](https://www.yuque.com/ruochuan12/notice) 活动，大家一起学习源码，共同进步。
 
